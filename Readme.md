@@ -21,10 +21,10 @@ I'm Sam, and I'm passionate about product engineering and web development. I cre
 
 ### About the app
 webpack app to run angular project. 
-[Demo](http://reactjsdevelopment.github.io/viewer)
 
 ### useful commands to run project
 - npm run start
+- npm run-script build
 
 ### Packages used
 -  html-webpack-plugin html-loader --save-dev (packages for processing HTML)

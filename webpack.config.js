@@ -2,9 +2,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ScriptExtPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const { AngularCompilerPlugin } = require('@ngtools/webpack');
+const path = require('path');
 
+const helpers = {
+    root: function (args) {
+        return path.join(__dirname, ...args);
+    }
+};
 
 module.exports = function () {
     return {
@@ -56,9 +63,15 @@ module.exports = function () {
                     test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/, loader: 'file-loader?name=assets/[name].[hash].[ext]'
                 },
                 {
-                    test: /\.css$/, exclude: helpers.root('src', 'app'),
-                    loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
-                },
+                //     test: /\.css$/, exclude: helpers.root('src', 'app'),
+                //     loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader?sourceMap' })
+       
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: 'css-loader'
+                })
+            },
                 { test: /\.css$/, include: helpers.root('src', 'app'), loader: 'raw-loader' },
                 {
                     test: /\.(scss|sass)$/,
@@ -91,7 +104,7 @@ module.exports = function () {
             }),
             new MiniCssExtractPlugin({
                 filename: "[name].css",
-                chunkFilename: "[id].css"
+                // chunkFilename: "[id].css"
             }),
             new ScriptExtPlugin({
                 defaultAttribute: 'defer'
@@ -100,8 +113,8 @@ module.exports = function () {
                 tsConfigPath: './tsconfig.json',
                 entryModule: './src/app/app.module#AppModule',
                 sourceMap: true
-            })
-
+            }),
+            new ExtractTextPlugin('styles.css') // Specify the output file name
         ]
     };
 }
