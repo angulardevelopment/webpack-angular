@@ -21,6 +21,11 @@ I'm Sam, and I'm passionate about product engineering and web development. I cre
 
 ### About the app
 webpack app to run angular project. 
+create build first then start server
+npm run build:dev
+npm run start-app
+npm run build
+npm start
 
 ### useful commands to run project
 - npm run start

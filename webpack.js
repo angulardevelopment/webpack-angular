@@ -1,6 +1,10 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { AngularWebpackPlugin } = require('@ngtools/webpack');
+const ScriptExtPlugin = require('script-ext-html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const AotPlugin = require('@ngtools/webpack').AngularCompilerPlugin;
+// const { AngularCompilerPlugin } = require('@ngtools/webpack');
 const path = require('path');
 
 const helpers = {
@@ -138,13 +142,33 @@ module.exports = function () {
         },
         module: {
             rules: [
+                { test: /\.ts$/, loader: '@ngtools/webpack' },
                 {
-                    test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
-                    loader: '@ngtools/webpack'
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: "babel-loader"
+                    }
+                },
+                {
+                    test: /\.html$/,
+                    use: [
+                        {
+                            loader: "html-loader",
+                            options: { minimize: true }
+                        }
+                    ]
+                },
+                {
+                    test: /\.css$/,
+                    use: [MiniCssExtractPlugin.loader, "css-loader"]
                 },
                 {
                     test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
-                    type: 'asset/resource'
+                    loader: 'file-loader',
+                    options: {
+                        name: 'assets/[name].[hash].[ext]'
+                    }
                 }
             ]
         },
@@ -156,20 +180,23 @@ module.exports = function () {
             }),
             new HtmlWebpackPlugin({
                 template: './src/index.html',
-                inject: 'head',
-                scriptLoading: 'defer'
+                inject: 'head'
             }),
-            new AngularWebpackPlugin({
-                tsconfig: path.resolve(__dirname, 'tsconfig.json')
+            new MiniCssExtractPlugin({
+                filename: "[name].css"
+            }),
+            new ScriptExtPlugin({
+                defaultAttribute: 'defer'
+            }),
+            new AotPlugin({
+                tsConfigPath: './tsconfig.json',
+                entryModule: path.join(__dirname, 'src/app/app.module#AppModule')
             })
         ],
         devServer: {
-            static: {
-                directory: path.join(__dirname, 'dist')
-            },
+            contentBase: path.join(__dirname, 'dist'),
             compress: true,
-            port: 8080,
-            historyApiFallback: true
+            port: 8080
         }
     };
 };
